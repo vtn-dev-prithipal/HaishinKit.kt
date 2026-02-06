@@ -77,12 +77,15 @@ internal class MediaRecorderMuxer(
         var trackIndex = -1
         if (mime.startsWith("audio")) {
             trackIndex = audioTrackIndex
-            if (info.presentationTimeUs == 0L) {
-                return true
-            }
+            // Fixed: Don't filter timestamp=0 - MediaCodec may legitimately produce first frames at time=0
+            // Only skip if buffer is empty (no actual audio data)
         }
         if (mime.startsWith("video")) {
             trackIndex = videoTrackIndex
+        }
+        // Only skip if buffer has no data
+        if (info.size == 0) {
+            return true
         }
         muxer?.writeSampleData(trackIndex, buffer, info)
         return true

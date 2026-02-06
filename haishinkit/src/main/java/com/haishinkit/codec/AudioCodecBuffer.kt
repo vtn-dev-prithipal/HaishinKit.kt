@@ -43,7 +43,13 @@ internal class AudioCodecBuffer {
         presentationTimestamp = DEFAULT_PRESENTATION_TIMESTAMP
     }
 
-    private fun timestamp(sampleCount: Int): Long = ((sampleCount.toFloat() / sampleRate.toFloat())).toLong()
+    private fun timestamp(sampleCount: Int): Long {
+        // Fixed: Calculate duration in microseconds with proper precision
+        // Avoids truncation errors that cause audio timing drift
+        // Formula: (samples / sampleRate) * 1,000,000 = microseconds
+        val durationSeconds = sampleCount.toDouble() / sampleRate.toDouble()
+        return (durationSeconds * 1_000_000.0).toLong()
+    }
 
     companion object {
         const val CAPACITY = 4
