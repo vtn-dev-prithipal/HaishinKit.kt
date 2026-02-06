@@ -10,8 +10,8 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.3.0" apply true
 }
 
-rootProject.ext["PUBLISH_GROUP_ID"] = "com.github.HaishinKit"
-rootProject.ext["PUBLISH_VERSION"] = "0.17.0"
+rootProject.ext["PUBLISH_GROUP_ID"] = "com.github.vtn-dev-prithipal"
+rootProject.ext["PUBLISH_VERSION"] = "0.17.2.1"
 
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
