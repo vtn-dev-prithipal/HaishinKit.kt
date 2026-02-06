@@ -218,8 +218,18 @@ class MediaMixer(
                 }
                 audioSources.forEach { audio ->
                     val buffer = audio.value.read(audio.key)
-                    outputs.forEach { output ->
-                        output.append(buffer)
+                    // Fix buffer reuse bug: Clone buffer for each output after the first
+                    // When multiple outputs are registered (e.g., RTMP + local recording),
+                    // sharing the same ByteBuffer causes corruption as outputs may modify it
+                    outputs.forEachIndexed { index, output ->
+                        if (index == 0) {
+                            // First output uses original buffer
+                            output.append(buffer)
+                        } else {
+                            // Clone buffer for subsequent outputs to prevent corruption
+                            val clonedBuffer = buffer.copy()
+                            output.append(clonedBuffer)
+                        }
                     }
                 }
             }
