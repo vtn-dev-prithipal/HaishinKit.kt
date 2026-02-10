@@ -15,15 +15,24 @@ data class MediaBuffer(
      */
     fun copy(): MediaBuffer {
         val clonedPayload = payload?.let { originalBuffer ->
+            // Save original state
             val originalPosition = originalBuffer.position()
             val originalLimit = originalBuffer.limit()
-            val cloned = ByteBuffer.allocateDirect(originalBuffer.capacity())
+
+            // Prepare original buffer for reading from start
             originalBuffer.rewind()
+
+            // Create clone and copy all data
+            val cloned = ByteBuffer.allocateDirect(originalBuffer.capacity())
             cloned.put(originalBuffer)
+
+            // Restore original buffer state
             originalBuffer.position(originalPosition)
             originalBuffer.limit(originalLimit)
-            cloned.position(originalPosition)
-            cloned.limit(originalLimit)
+
+            // Prepare cloned buffer for reading: position=0, limit=amount of data
+            cloned.flip()
+
             cloned
         }
         return MediaBuffer(
