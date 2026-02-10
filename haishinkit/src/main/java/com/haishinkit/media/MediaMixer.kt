@@ -146,9 +146,13 @@ class MediaMixer(
                     delay(1000)
                 }
                 audioSources.forEach { audio ->
-                    var buffer = audio.value.read(audio.key)
-                    outputs.forEach { output ->
-                        output.append(buffer)
+                    val buffer = audio.value.read(audio.key)
+                    outputs.forEachIndexed { index, output ->
+                        if (index == 0) {
+                            output.append(buffer)
+                        } else {
+                            output.append(buffer.copy())
+                        }
                     }
                 }
             }
