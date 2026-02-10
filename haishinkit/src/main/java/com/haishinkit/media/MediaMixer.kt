@@ -147,12 +147,16 @@ class MediaMixer(
                 }
                 audioSources.forEach { audio ->
                     val buffer = audio.value.read(audio.key)
-                    outputs.forEachIndexed { index, output ->
-                        if (index == 0) {
-                            output.append(buffer)
-                        } else {
-                            output.append(buffer.copy())
-                        }
+
+                    // Create all copies FIRST before any output consumes buffers
+                    // This prevents race conditions where outputs modify buffers
+                    val buffers = outputs.mapIndexed { index, _ ->
+                        if (index == 0) buffer else buffer.copy()
+                    }
+
+                    // Now safely append to all outputs with their respective buffers
+                    buffers.forEachIndexed { index, buf ->
+                        outputs[index].append(buf)
                     }
                 }
             }
